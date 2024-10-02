@@ -6,7 +6,7 @@ import numpy as np
 import os
 import torch
 
-from  Depth_Anything_V2.metric_depth.depth_anything_v2.dpt import DepthAnythingV2
+from  assets.Depth_Anything_V2.metric_depth.depth_anything_v2.dpt import DepthAnythingV2
 
 from inference_sdk import InferenceHTTPClient
 

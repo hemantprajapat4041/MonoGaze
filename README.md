@@ -1,5 +1,62 @@
-# Download
 
-> Download proper model from https://github.com/DepthAnything/Depth-Anything-V2/tree/main/metric_depth and save in `checkpoints` folder.
+<br/>
+<div align="center">
+<a href="https://github.com/ShaanCoding/ReadME-Generator">
+<img src="https://picsum.photos/400" alt="Logo" width="80" height="80">
+</a>
+<h3 align="center">Inter-Vechicular Depth Estimation from RGB Camera Feed</h3>
 
-> Download test images/video into `test` folder
+</div>
+
+## About The Project
+
+![Product Screenshot](https://picsum.photos/1920/1080)
+
+This project focuses on the estimation of headway—the distance between a vehicle and the vehicle directly in front—using depth estimation from monocular RGB video feeds. By leveraging deep learning techniques, the project aims to derive accurate distance measurements, which are crucial for understanding driving patterns in congested urban environments, particularly in Guwahati City.
+### Prerequisites
+
+The primary objectives of this research are:
+
+1. Depth Estimation: Utilisation deep learning algorithms to extract depth information from monocular RGB video feeds, allowing for the estimation of distance to the vehicle ahead.
+
+2. Headway Calculation: Derive the estimated headway between the host vehicle and the vehicle directly in front, providing essential data for analysing driving behaviour.
+
+3. Behavioal Analysis: Integrate additional parameters such as driver speed, acceleration, and concentration, assessed through facial emotion detection, to develop a comprehensive understanding of driving patterns in highly congested areas.
+
+4. Road Safety Improvement: Utilise the insights gained from the analysis to propose measures aimed at enhancing road safety and understanding driver responses to various stimuli.
+## Usage
+
+This research lays the groundwork for further studies in driver behavior and safety enhancements in urban settings. Future work may include:
+
+1. Expanding the dataset to include various traffic conditions.
+2. Enhancing the depth estimation model for increased accuracy in diverse environmental conditions.
+3. Exploring the impact of environmental factors on driver behaviour.
+## Getting Started
+
+1. Clone repository.
+2. Download proper model (based on environment of use) from [here](https://github.com/DepthAnything/Depth-Anything-V2/tree/main/metric_depth#pre-trained-models) and save in `assets/Depth_Anything_V2/checkpoints` folder.
+3. Download test images/video for prediction into `test` folder.
+4. Move to the base folder and run ``` pip install -r requirements.txt```. It is preferable to use a conda environment. Tested for python==3.11.5
+5. The environment is ready to run. Use the following code in terminal:
+> For Image:
+
+```python run_image.py --input-path <path-to-input-directory> --outdir <path-to-output-directory> --encoder <vits/vitb/vitl/vitg> --max-depth <numeric-values-in-meters>```
+
+> For Image:
+
+```python run_video.py --input-path <path-to-input-directory> --outdir <path-to-output-directory> --encoder <vits/vitb/vitl/vitg> --max-depth <numeric-values-in-meters>```
+
+Replace arguments with correct alternatives.
+## Roadmap
+
+- [x] Estimate depth in ambient lighting conditions
+- [x] Detect for Cars using prebuilt Roboflow Model.
+- [x] Develop custom model for multiple vehicle headway detection (Ongoing) 
+- [ ] Integration with 2D-LIDAR 
+- [ ] Integration with Driver Behaviour Model
+## License
+
+Distributed under the MIT License. See [MIT License](https://opensource.org/licenses/MIT) for more information.
+## Contact
+
+Your Name - [Aditya Paul](https://www.linkedin.com/in/adityapaul03/) - adityapaul.official@outlook.com
