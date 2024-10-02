@@ -1,12 +1,8 @@
 
-<br/>
-<div align="center">
-<a href="https://github.com/ShaanCoding/ReadME-Generator">
-<img src="https://picsum.photos/400" alt="Logo" width="80" height="80">
-</a>
-<h3 align="center">Inter-Vechicular Depth Estimation from RGB Camera Feed</h3>
+![WhatsApp Image 2024-08-19 at 14 09 44](https://github.com/user-attachments/assets/8934eebd-1de8-4d34-9c5f-b9188fa12f10)
 
-</div>
+# Inter-Vechicular Depth Estimation from RGB Camera Feed
+
 
 ## About The Project
 
