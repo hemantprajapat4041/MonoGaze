@@ -53,4 +53,4 @@ Replace arguments with correct alternatives.
 Distributed under the MIT License. See [MIT License](https://opensource.org/licenses/MIT) for more information.
 ## Contact
 
-Your Name - [Aditya Paul](https://www.linkedin.com/in/adityapaul03/) - adityapaul.official@outlook.com
+[Aditya Paul]([https://www.linkedin.com/in/adityapaul03/](https://aditya-pauls-portfolio.vercel.app/)) - [LinkedIn](https://www.linkedin.com/in/adityapaul03/) - adityapaul.official@outlook.com
