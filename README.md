@@ -40,12 +40,14 @@ This research lays the groundwork for further studies in driver behavior and saf
 
 ```python run_video.py --input-path <path-to-input-directory> --outdir <path-to-output-directory> --encoder <vits/vitb/vitl/vitg> --max-depth <numeric-values-in-meters>```
 
+Demo Result: [YouTube](https://www.youtube.com/watch?v=dbGtP_d9eHU)
+
 Replace arguments with correct alternatives.
 ## Roadmap
 
 - [x] Estimate depth in ambient lighting conditions
 - [x] Detect for Cars using prebuilt Roboflow Model.
-- [x] Develop custom model for multiple vehicle headway detection (Ongoing) 
+- [x] Develop custom model for multiple vehicle headway detection and increased detection accuracy. (Ongoing) 
 - [ ] Integration with 2D-LIDAR 
 - [ ] Integration with Driver Behaviour Model
 ## License
@@ -53,4 +55,4 @@ Replace arguments with correct alternatives.
 Distributed under the MIT License. See [MIT License](https://opensource.org/licenses/MIT) for more information.
 ## Contact
 
-[Aditya Paul]([https://www.linkedin.com/in/adityapaul03/](https://aditya-pauls-portfolio.vercel.app/)) - [LinkedIn](https://www.linkedin.com/in/adityapaul03/) - adityapaul.official@outlook.com
+[Aditya Paul - Website](https://aditya-pauls-portfolio.vercel.app/) - [LinkedIn](https://www.linkedin.com/in/adityapaul03/) - adityapaul.official@outlook.com
