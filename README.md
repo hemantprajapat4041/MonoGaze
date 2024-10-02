@@ -6,7 +6,7 @@
 
 ## About The Project
 
-This project focuses on the estimation of headway—the distance between a vehicle and the vehicle directly in front—using depth estimation from monocular RGB video feeds. By leveraging deep learning techniques, the project aims to derive accurate distance measurements, which are crucial for understanding driving patterns in congested urban environments, particularly in Guwahati City.
+This project focuses on the estimation of headway, the distance between a vehicle and the vehicle directly in front, using depth estimation from monocular RGB video feeds. By leveraging deep learning techniques, the project aims to derive accurate distance measurements, which are crucial for understanding driving patterns in congested urban environments, particularly in Guwahati City.
 ### Prerequisites
 
 The primary objectives of this research are:
