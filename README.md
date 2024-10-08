@@ -15,7 +15,7 @@ The primary objectives of this research are:
 
 2. Headway Calculation: Derive the estimated headway between the host vehicle and the vehicle directly in front, providing essential data for analysing driving behaviour.
 
-3. Behavioal Analysis: Integrate additional parameters such as driver speed, acceleration, and concentration, assessed through facial emotion detection, to develop a comprehensive understanding of driving patterns in highly congested areas.
+3. Behavorial Analysis: Integrate additional parameters such as driver speed, acceleration, and concentration, assessed through facial emotion detection, to develop a comprehensive understanding of driving patterns in highly congested areas.
 
 4. Road Safety Improvement: Utilise the insights gained from the analysis to propose measures aimed at enhancing road safety and understanding driver responses to various stimuli.
 ## Usage
