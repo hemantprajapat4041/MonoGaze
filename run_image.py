@@ -8,6 +8,7 @@ import torch
 
 from models.depth_models.Depth_Anything_V2.metric_depth.depth_anything_v2.dpt import DepthAnythingV2
 from utils.yolo.functions import Yolo2DObjectDetection
+from utils.generic_functions.functions import DepthApproximation
 
 def decode_depth(val):
     NewValue = val*80/255
@@ -91,6 +92,7 @@ if __name__ == '__main__':
     
     cmap = matplotlib.colormaps.get_cmap('Spectral')
     model = Yolo2DObjectDetection('models/detection_models/bounding_box/test.pt')
+    depth_approximator = DepthApproximation()
     
     for k, filename in enumerate(filenames):
         print(f'Progress {k+1}/{len(filenames)}: {filename}')
@@ -102,7 +104,8 @@ if __name__ == '__main__':
 
         predictions = model.predict(raw_image)
 
-        depth_frame = get_object_depth(predictions, depth, raw_image)
+        depth_value = depth_approximator.bounding_box_average(predictions, depth)
+        depth_frame = depth_approximator.annotate_depth_on_img(raw_image, depth_value)
         cv2.imwrite(output_path, depth_frame)
         
         if args.savenumpy:
