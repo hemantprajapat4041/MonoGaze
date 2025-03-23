@@ -6,9 +6,8 @@ import numpy as np
 import os
 import torch
 
-from assets.Depth_Anything_V2.metric_depth.depth_anything_v2.dpt import DepthAnythingV2
-
-from inference_sdk import InferenceHTTPClient
+from models.depth_models.Depth_Anything_V2.metric_depth.depth_anything_v2.dpt import DepthAnythingV2
+from utils.yolo.functions import Yolo2DObjectDetection
 
 def decode_depth(val):
     NewValue = val*80/255
@@ -23,8 +22,8 @@ def get_object_depth(predictions, depth_grid,img):
     for i,j in pts:
         count=0
         depth=0
-        for x in range(i[0],j[0]+1):
-            for y in range(i[1],j[1]+1):
+        for x in range(i[0],j[0]):
+            for y in range(i[1],j[1]):
                 depth+=decode_depth(depth_grid[y][x])
                 count+=1
         depth=depth/count
@@ -91,6 +90,7 @@ if __name__ == '__main__':
         os.makedirs(args.colormap, exist_ok=True)
     
     cmap = matplotlib.colormaps.get_cmap('Spectral')
+    model = Yolo2DObjectDetection('models/detection_models/bounding_box/test.pt')
     
     for k, filename in enumerate(filenames):
         print(f'Progress {k+1}/{len(filenames)}: {filename}')
@@ -100,14 +100,9 @@ if __name__ == '__main__':
         depth = depth_anything.infer_image(raw_image, args.input_size)
         output_path = os.path.join(args.outdir, os.path.splitext(os.path.basename(filename))[0] + 'frame.png')
 
-        CLIENT = InferenceHTTPClient(
-            api_url="https://detect.roboflow.com",
-            api_key="LIBwQMSFtQcfjb2PHaKU"
-            )   
+        predictions = model.predict(raw_image)
 
-        predictions = CLIENT.infer(raw_image, model_id="test-2-g3mkp/15")
-
-        depth_frame = get_object_depth(predictions['predictions'], depth, raw_image)
+        depth_frame = get_object_depth(predictions, depth, raw_image)
         cv2.imwrite(output_path, depth_frame)
         
         if args.savenumpy:

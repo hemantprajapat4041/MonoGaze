@@ -4,5 +4,5 @@ torch
 torchvision
 opencv-python
 huggingface_hub
-inference-sdk
+ultralytics
 pillow

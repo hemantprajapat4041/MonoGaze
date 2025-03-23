@@ -6,7 +6,7 @@ import numpy as np
 import os
 import torch
 
-from  assets.Depth_Anything_V2.metric_depth.depth_anything_v2.dpt import DepthAnythingV2
+from models.depth_models.Depth_Anything_V2.metric_depth.depth_anything_v2.dpt import DepthAnythingV2
 
 from inference_sdk import InferenceHTTPClient
 
@@ -23,8 +23,8 @@ def get_object_depth(predictions, depth_grid,img):
     for i,j in pts:
         count=0
         depth=0
-        for x in range(i[0],j[0]+1):
-            for y in range(i[1],j[1]+1):
+        for x in range(i[0],j[0]):
+            for y in range(i[1],j[1]):
                 depth+=decode_depth(depth_grid[y][x])
                 count+=1
         depth=depth/count
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     parser.add_argument('--outdir', type=str, default='./vis_depth')
     
     parser.add_argument('--encoder', type=str, default='vitl', choices=['vits', 'vitb', 'vitl', 'vitg'])
-    parser.add_argument('--load-from', type=str, default='checkpoints/depth_anything_v2_metric_hypersim_vitl.pth')
+    parser.add_argument('--load-from', type=str, default='/home/robo/Desktop/MonoGaze/assets/Depth_Anything_V2/checkpoints/depth_anything_v2_metric_vkitti_vitl.pth')
     parser.add_argument('--max-depth', type=float,dest='max_depth', default=20)
     
     parser.add_argument('--savenumpy', type=str, help='save the model raw output')
@@ -113,10 +113,10 @@ if __name__ == '__main__':
 
             CLIENT = InferenceHTTPClient(
             api_url="https://detect.roboflow.com",
-            api_key="LIBwQMSFtQcfjb2PHaKU"
+            api_key="4gncX6jQQIlQ0r90Agoh"
             )   
 
-            predictions = CLIENT.infer(raw_frame, model_id="test-2-g3mkp/15")
+            predictions = CLIENT.infer(raw_frame, model_id="vehicle_dectection/3")
 
             depth_frame = get_object_depth(predictions['predictions'], depth, raw_frame)
             out.write(depth_frame)
