@@ -51,6 +51,4 @@ docs/_build/
 
 .DS_Store
 .vscode
-test.py
-models/depth_models/Depth_Anything_V2/checkpoints
-models/detection_models/bounding_box/test.pt
+sensor_output
