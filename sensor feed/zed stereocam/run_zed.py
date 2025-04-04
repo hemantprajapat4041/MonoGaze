@@ -31,6 +31,8 @@ def main():
     init_params.camera_fps = 60  # Set camera FPS to 20
     init_params.depth_mode = sl.DEPTH_MODE.ULTRA  # Use ULTRA for better depth quality
     init_params.coordinate_units = sl.UNIT.METER  # Set units to meter
+    init_params.depth_minimum_distance = 0.15
+    init_params.depth_maximum_distance = 40.0
     
     # Create ZED camera object
     zed = sl.Camera()
