@@ -6,3 +6,5 @@ opencv-python
 huggingface_hub
 ultralytics
 pillow
+
+-e .
