@@ -47,8 +47,8 @@ Replace arguments with correct alternatives.
 
 - [x] Estimate depth in ambient lighting conditions
 - [x] Detect for Cars using prebuilt Roboflow Model.
-- [x] Develop custom model for multiple vehicle headway detection and increased detection accuracy. (Ongoing) 
-- [ ] Integration with 2D-LIDAR 
+- [x] Develop custom model for multiple vehicle headway detection and increased detection accuracy.
+- [x] Integration with Stereo-Camera data for validation figures (Ongoing)
 - [ ] Integration with Driver Behaviour Model
 ## License
 

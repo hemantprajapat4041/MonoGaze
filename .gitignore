@@ -53,4 +53,5 @@ docs/_build/
 .vscode
 test.py
 models/depth_models/Depth_Anything_V2/checkpoints
-models/detection_models/bounding_box/test.pt
+*.pt 
+results

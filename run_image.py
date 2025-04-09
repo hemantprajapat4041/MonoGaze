@@ -10,53 +10,16 @@ from models.depth_models.Depth_Anything_V2.metric_depth.depth_anything_v2.dpt im
 from utils.yolo.functions import Yolo2DObjectDetection
 from utils.generic_functions.functions import DepthApproximation
 
-def decode_depth(val):
-    NewValue = val*80/255
-    return NewValue
-
-def get_object_depth(predictions, depth_grid,img):
-    pts = []
-    for pred in predictions:
-        pts.append([[int(pred['x']-pred['width']/2), int(pred['y']-pred['height']/2)],[int(pred['x']+pred['width']/2), int(pred['y']+pred['height']/2)]])  
-    
-    depth_all =[]
-    for i,j in pts:
-        count=0
-        depth=0
-        for x in range(i[0],j[0]):
-            for y in range(i[1],j[1]):
-                depth+=decode_depth(depth_grid[y][x])
-                count+=1
-        depth=depth/count
-        depth_all.append(depth)
-
-    index=0
-    for pred in predictions:
-        pred.update({'estimated_depth':depth_all[index]})
-        index+=1
-        cv2.rectangle(img=img, pt1=(int(pred['x']-pred['width']/2), int(pred['y']-pred['height']/2)),
-                            pt2=(int(pred['x']+pred['width']/2), int(pred['y']+pred['height']/2)),
-                            color=(0,255,255), thickness=3)# cv2.imshow('Result', img)
-        pred.update({'detection_id': index})
-        depth=str(pred['estimated_depth'])
-        img = cv2.putText(img, str(id), (int(pred['x']-pred['width']/2)-10, int(pred['y']-pred['height']/2)-10), cv2.FONT_HERSHEY_SIMPLEX, 1, 
-                        (0, 0, 255), 2, cv2.LINE_AA, False)
-        img = cv2.putText(img, depth, (int(pred['x']+pred['width']/2)-100, int(pred['y']+pred['height']/2)+30), cv2.FONT_HERSHEY_SIMPLEX, 0.75, 
-                        (0, 0, 255), 1, cv2.LINE_AA, False)
-    
-    return img
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Depth Anything V2 Metric Depth Estimation')
     
     parser.add_argument('--input-path', type=str)
     parser.add_argument('--input-size', type=int, default=518)
-    parser.add_argument('--outdir', type=str, default='./vis_depth')
+    parser.add_argument('--outdir', type=str, default='./results/image')
     
     parser.add_argument('--encoder', type=str, default='vitl', choices=['vits', 'vitb', 'vitl', 'vitg'])
-    parser.add_argument('--load-from', type=str, default='checkpoints/depth_anything_v2_metric_hypersim_vitl.pth')
-    parser.add_argument('--max-depth', type=float,dest='max_depth', default=20)
+    parser.add_argument('--load-from', type=str, default='models/depth_models/Depth_Anything_V2/checkpoints/depth_anything_v2_metric_vkitti_vitl.pth')
+    parser.add_argument('--max-depth', type=float,dest='max_depth', default=80)
     
     parser.add_argument('--savenumpy', type=str, help='save the model raw output')
     parser.add_argument('--colormap', type=str, default='', help='only display the prediction')
@@ -92,7 +55,7 @@ if __name__ == '__main__':
     
     cmap = matplotlib.colormaps.get_cmap('Spectral')
     model = Yolo2DObjectDetection('models/detection_models/bounding_box/test.pt')
-    depth_approximator = DepthApproximation()
+    depth_approximator = DepthApproximation(max_depth=args.max_depth)
     
     for k, filename in enumerate(filenames):
         print(f'Progress {k+1}/{len(filenames)}: {filename}')
@@ -100,12 +63,12 @@ if __name__ == '__main__':
         raw_image = cv2.imread(filename)
         
         depth = depth_anything.infer_image(raw_image, args.input_size)
-        output_path = os.path.join(args.outdir, os.path.splitext(os.path.basename(filename))[0] + 'frame.png')
+        output_path = os.path.join(args.outdir, os.path.splitext(os.path.basename(filename))[0] + '_frame.png')
 
         predictions = model.predict(raw_image)
 
-        depth_value = depth_approximator.bounding_box_average(predictions, depth)
-        depth_frame = depth_approximator.annotate_depth_on_img(raw_image, depth_value)
+        predictions = depth_approximator.depth(predictions, depth)
+        depth_frame = depth_approximator.annotate_depth_on_img(raw_image, predictions)
         cv2.imwrite(output_path, depth_frame)
         
         if args.savenumpy:
@@ -116,6 +79,6 @@ if __name__ == '__main__':
             depth = (depth - depth.min()) / (depth.max() - depth.min()) * 255.0
             depth = depth.astype(np.uint8)
             depth = (cmap(depth)[:, :, :3] * 255)[:, :, ::-1].astype(np.uint8)
-            output_path = os.path.join(args.colormap, os.path.splitext(os.path.basename(filename))[0] + 'colormap' + 'frame.png')
+            output_path = os.path.join(args.colormap, os.path.splitext(os.path.basename(filename))[0] + '_colormap_' + 'frame.png')
             
             cv2.imwrite(output_path, depth)

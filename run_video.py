@@ -7,6 +7,8 @@ import os
 import torch
 
 from models.depth_models.Depth_Anything_V2.metric_depth.depth_anything_v2.dpt import DepthAnythingV2
+from utils.yolo.functions import Yolo2DObjectDetection
+from utils.generic_functions.functions import DepthApproximation
 
 from inference_sdk import InferenceHTTPClient
 
@@ -52,11 +54,11 @@ if __name__ == '__main__':
     
     parser.add_argument('--input-path', type=str)
     parser.add_argument('--input-size', type=int, default=518)
-    parser.add_argument('--outdir', type=str, default='./vis_depth')
+    parser.add_argument('--outdir', type=str, default='./results/video')
     
     parser.add_argument('--encoder', type=str, default='vitl', choices=['vits', 'vitb', 'vitl', 'vitg'])
-    parser.add_argument('--load-from', type=str, default='/home/robo/Desktop/MonoGaze/assets/Depth_Anything_V2/checkpoints/depth_anything_v2_metric_vkitti_vitl.pth')
-    parser.add_argument('--max-depth', type=float,dest='max_depth', default=20)
+    parser.add_argument('--load-from', type=str, default='models/depth_models/Depth_Anything_V2/checkpoints/depth_anything_v2_metric_vkitti_vitl.pth')
+    parser.add_argument('--max-depth', type=float,dest='max_depth', default=80)
     
     parser.add_argument('--savenumpy', type=str, help='save the model raw output')
     parser.add_argument('--colormap', type=str, default='', help='only display the prediction')
@@ -91,6 +93,8 @@ if __name__ == '__main__':
     
     margin_width=50
     cmap = matplotlib.colormaps.get_cmap('Spectral')
+    model = Yolo2DObjectDetection('models/detection_models/bounding_box/test.pt')
+    depth_approximator = DepthApproximation(max_depth=args.max_depth)
     
     for k, filename in enumerate(filenames):
         print(f'Progress {k+1}/{len(filenames)}: {filename}')
@@ -104,21 +108,17 @@ if __name__ == '__main__':
         out_colormap = cv2.VideoWriter(args.colormap, cv2.VideoWriter_fourcc(*"mp4v"), frame_rate, (frame_width, frame_height))
         
         frame=1
-        while raw_video.isOpened():
+        while raw_video.isOpened() and frame<10:
             ret, raw_frame = raw_video.read()
             if not ret:
                 break
             
             depth = depth_anything.infer_image(raw_frame, args.input_size)
 
-            CLIENT = InferenceHTTPClient(
-            api_url="https://detect.roboflow.com",
-            api_key="4gncX6jQQIlQ0r90Agoh"
-            )   
+            predictions = model.predict(raw_frame)
 
-            predictions = CLIENT.infer(raw_frame, model_id="vehicle_dectection/3")
-
-            depth_frame = get_object_depth(predictions['predictions'], depth, raw_frame)
+            predictions = depth_approximator.depth(predictions, depth)
+            depth_frame = depth_approximator.annotate_depth_on_img(raw_frame, predictions)
             out.write(depth_frame)
 
             if args.savenumpy:
@@ -134,3 +134,7 @@ if __name__ == '__main__':
             frame+=1
         
         raw_video.release()
+        out.release()
+        if args.colormap:
+            out_colormap.release()
+            
