@@ -10,7 +10,7 @@ from utils.detection import Yolo2DObjectDetection
 from utils.generic import DepthApproximation
 
 class DepthAnythingV2Inference:
-    def __init__(self, input_path, load_from='models/depth_models/Depth_Anything_V2/checkpoints/depth_anything_v2_metric_vkitti_vitl.pth', input_size=518, outdir='results', encoder='vitl', max_depth=80, savenumpy=False, colormap=''):
+    def __init__(self, input_path, load_from='models/depth_models/Depth_Anything_V2/checkpoints/depth_anything_v2_metric_vkitti_vitl.pth', input_size=518, outdir='results/depth_anything', encoder='vitl', max_depth=80, savenumpy=False, colormap='', eval=False, depth_path=''):
         self.input_path = input_path
         self.input_size = input_size
         self.outdir = outdir
@@ -19,6 +19,8 @@ class DepthAnythingV2Inference:
         self.max_depth = max_depth
         self.savenumpy = savenumpy
         self.colormap = colormap
+        self.evalualte = eval
+        self.depth_path = depth_path
 
         self.DEVICE = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
         self.model_configs = {
@@ -57,12 +59,14 @@ class DepthAnythingV2Inference:
             raw_image = cv2.imread(filename)
             
             depth = self.depth_anything.infer_image(raw_image, self.input_size)
-            output_path = os.path.join(self.outdir, os.path.splitext(os.path.basename(filename))[0] +'_frame.png')
+            output_path = os.path.join(self.outdir,'frame_{}.png'.format(k))
 
             predictions = self.model.predict(raw_image)
 
             predictions = self.depth_approximator.depth(predictions, depth)
             depth_frame = self.depth_approximator.annotate_depth_on_img(raw_image, predictions)
+            if self.evalualte:
+                depth_frame = self.depth_approximator.evaluate(self.depth_path, depth_frame, filename, predictions)
             cv2.imwrite(output_path, depth_frame)
             
             if self.savenumpy:
@@ -77,7 +81,7 @@ class DepthAnythingV2Inference:
                 
                 cv2.imwrite(output_path, depth)
         
-        print(f'Output saved to {output_path}')
+        print(f'Output saved to {self.outdir}')
 
 
     def process_video(self):
@@ -93,7 +97,7 @@ class DepthAnythingV2Inference:
             out_colormap = cv2.VideoWriter(self.colormap, cv2.VideoWriter_fourcc(*"mp4v"), frame_rate, (frame_width, frame_height))
             
             frame=1
-            while raw_video.isOpened() and frame<5:
+            while raw_video.isOpened():
                 ret, raw_frame = raw_video.read()
                 if not ret:
                     break
@@ -101,7 +105,7 @@ class DepthAnythingV2Inference:
                 depth = self.depth_anything.infer_image(raw_frame, self.input_size)
 
                 predictions = self.model.predict(raw_frame)
-
+                print(depth.shape)
                 predictions = self.depth_approximator.depth(predictions, depth)
                 depth_frame = self.depth_approximator.annotate_depth_on_img(raw_frame, predictions)
                 out.write(depth_frame)
@@ -122,4 +126,5 @@ class DepthAnythingV2Inference:
             out.release()
             if self.colormap:
                 out_colormap.release()
-        print(f'Output saved to {output_path}')
+        print(f'Output saved to {self.outdir}')
+

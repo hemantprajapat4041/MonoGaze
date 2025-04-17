@@ -7,11 +7,11 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from layers import disp_to_depth
-from utils import readlines
-from options import MonodepthOptions
-import datasets
-import networks
+from models.depth_models.Mono_Depth_2.layers import disp_to_depth
+from models.depth_models.Mono_Depth_2.utils import readlines
+from models.depth_models.Mono_Depth_2.options import MonodepthOptions
+import models.depth_models.Mono_Depth_2.datasets as datasets
+import models.depth_models.Mono_Depth_2.networks as networks
 
 cv2.setNumThreads(0)  # This speeds up evaluation 5x on our unix systems (OpenCV 3.3.1)
 

@@ -22,7 +22,7 @@ def disp_to_depth(disp, min_depth, max_depth):
     max_disp = 1 / min_depth
     scaled_disp = min_disp + (max_disp - min_disp) * disp
     depth = 1 / scaled_disp
-    return scaled_disp, depth
+    return depth
 
 
 def transformation_from_parameters(axisangle, translation, invert=False):
