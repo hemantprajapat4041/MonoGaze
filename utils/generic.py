@@ -5,7 +5,7 @@ class DepthApproximation:
     def __init__(self, max_depth=80):
         self.max_depth = max_depth
 
-    def depth(self, predictions, depth, decode=True, eval=False):
+    def depth(self, predictions, depth, decode=True, eval=False, val=80):
         for pred in predictions:
             check = np.inf
             for x in range(pred['x1'],pred['x2']):
@@ -13,7 +13,7 @@ class DepthApproximation:
                     if depth[y][x] < check:
                         check = depth[y][x]
             if decode and not eval:
-                pred.update({'estimated_depth': self.decode_depth(check)})
+                pred.update({'estimated_depth': self.decode_depth(check, val)})
             elif not decode and not eval:
                 pred.update({'estimated_depth': check})
             if eval:
@@ -23,6 +23,8 @@ class DepthApproximation:
 
     def annotate_depth_on_img(self, img, predictions, eval=False):
         for pred in predictions:
+            if pred['estimated_depth'] == np.inf:
+                continue
             if eval:
                 cv2.putText(img=img, text='AD ' + str(round(pred['actual_depth'], 3))+'m', org=(int(pred['x1']), int(pred['y2']-6)),
                             fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.5, color=(0, 255, 0), thickness=1)

@@ -10,7 +10,7 @@ from utils.detection import Yolo2DObjectDetection
 from utils.generic import DepthApproximation
 
 class DepthAnythingV2Inference:
-    def __init__(self, input_path, load_from='models/depth_models/Depth_Anything_V2/checkpoints/depth_anything_v2_metric_vkitti_vitl.pth', input_size=518, outdir='results/depth_anything', encoder='vitl', max_depth=80, savenumpy=False, colormap='', eval=False, depth_path=''):
+    def __init__(self, input_path, load_from='models/depth_models/Depth_Anything_V2/checkpoints/depth_anything_v2_metric_vkitti_vitl.pth', input_size=518, outdir='results/depth_anything', encoder='vitl', max_depth=80, savenumpy=False, colormap='', eval=False, depth_path='', stream=False):
         self.input_path = input_path
         self.input_size = input_size
         self.outdir = outdir
@@ -21,6 +21,7 @@ class DepthAnythingV2Inference:
         self.colormap = colormap
         self.evalualte = eval
         self.depth_path = depth_path
+        self.stream = stream
 
         self.DEVICE = 'cuda' if torch.cuda.is_available() else 'mps' if torch.backends.mps.is_available() else 'cpu'
         self.model_configs = {
@@ -84,47 +85,61 @@ class DepthAnythingV2Inference:
         print(f'Output saved to {self.outdir}')
 
 
-    def process_video(self):
-        for k, filename in enumerate(self.filenames):
-            print(f'Progress {k+1}/{len(self.filenames)}: {filename}')
-            
-            raw_video = cv2.VideoCapture(filename)
-            length = int(raw_video.get(cv2.CAP_PROP_FRAME_COUNT))
-            frame_width, frame_height = int(raw_video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(raw_video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            frame_rate = int(raw_video.get(cv2.CAP_PROP_FPS))
-            output_path = os.path.join(self.outdir, os.path.splitext(os.path.basename(filename))[0] + '.mp4')
-            out = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*"mp4v"), frame_rate, (frame_width, frame_height))
-            out_colormap = cv2.VideoWriter(self.colormap, cv2.VideoWriter_fourcc(*"mp4v"), frame_rate, (frame_width, frame_height))
-            
-            frame=1
-            while raw_video.isOpened():
-                ret, raw_frame = raw_video.read()
-                if not ret:
-                    break
-                
-                depth = self.depth_anything.infer_image(raw_frame, self.input_size)
+    def process_video(self, fps=30):
+        if not self.stream:
+            for k, filename in enumerate(self.filenames):
+                raw_video = cv2.VideoCapture(filename)
+                length = int(raw_video.get(cv2.CAP_PROP_FRAME_COUNT))
+                frame_width, frame_height = int(raw_video.get(cv2.CAP_PROP_FRAME_WIDTH)), int(raw_video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                frame_rate = int(raw_video.get(cv2.CAP_PROP_FPS))/3
+                output_path = os.path.join(self.outdir, os.path.splitext(os.path.basename(filename))[0] + '.mp4')
+                out = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*"mp4v"), frame_rate, (frame_width, frame_height))
+                out_colormap = cv2.VideoWriter(self.colormap, cv2.VideoWriter_fourcc(*"mp4v"), frame_rate, (frame_width, frame_height))
+                frame=1
+                print(f'Progress {k+1}/{len(self.filenames)}: {filename}')
+                while raw_video.isOpened():
+                    ret, raw_frame = raw_video.read()
+                    if not ret:
+                        break
+                    
+                    depth = self.depth_anything.infer_image(raw_frame, self.input_size)
 
+                    predictions = self.model.predict(raw_frame)
+                    predictions = self.depth_approximator.depth(predictions, depth)
+                    depth_frame = self.depth_approximator.annotate_depth_on_img(raw_frame, predictions)
+                    if self.evalualte:
+                        depth_frame = self.depth_approximator.evaluate(self.depth_path, depth_frame, filename, predictions)
+                    out.write(depth_frame)
+
+                    if self.savenumpy:
+                        output_path = os.path.join(self.savenumpy, os.path.splitext(os.path.basename(filename))[0] + '_numpy_matrix' + '_raw_depth_meter_frame' + str(frame) + '.npy')
+                        np.save(output_path, depth)
+
+                    if self.colormap:
+                        depth = (depth - depth.min()) / (depth.max() - depth.min()) * 255.0
+                        depth = depth.astype(np.uint8)
+                        depth = (self.cmap(depth)[:, :, :3] * 255)[:, :, ::-1].astype(np.uint8)
+                        out_colormap.write(depth)
+                    print(f'Frame: {frame}/{length} complete')
+                    frame+=1
+                
+                raw_video.release()
+                out.release()
+                if self.colormap:
+                    out_colormap.release()
+        else:
+            self.filenames.sort()
+            for k, filename in enumerate(self.filenames):
+                print(f'Progress {k+1}/{len(self.filenames)}: {filename}')
+                raw_frame = cv2.imread(filename)
+                img_width, img_height = raw_frame.shape[:2]
+                out = cv2.VideoWriter(output_path, cv2.VideoWriter_fourcc(*"mp4v"), fps, (img_width, img_height))
                 predictions = self.model.predict(raw_frame)
-                print(depth.shape)
+
                 predictions = self.depth_approximator.depth(predictions, depth)
                 depth_frame = self.depth_approximator.annotate_depth_on_img(raw_frame, predictions)
+                if self.evalualte:
+                    depth_frame = self.depth_approximator.evaluate(self.depth_path, depth_frame, filename, predictions)
                 out.write(depth_frame)
-
-                if self.savenumpy:
-                    output_path = os.path.join(self.savenumpy, os.path.splitext(os.path.basename(filename))[0] + '_numpy_matrix' + '_raw_depth_meter_frame' + str(frame) + '.npy')
-                    np.save(output_path, depth)
-
-                if self.colormap:
-                    depth = (depth - depth.min()) / (depth.max() - depth.min()) * 255.0
-                    depth = depth.astype(np.uint8)
-                    depth = (self.cmap(depth)[:, :, :3] * 255)[:, :, ::-1].astype(np.uint8)
-                    out_colormap.write(depth)
-                print(f'Frame: {frame}/{length} complete')
-                frame+=1
-            
-            raw_video.release()
             out.release()
-            if self.colormap:
-                out_colormap.release()
         print(f'Output saved to {self.outdir}')
-
