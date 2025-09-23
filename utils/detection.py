@@ -7,8 +7,8 @@ class Yolo2DObjectDetection:
 
     def predict(self,image):
         model = self.model
-        # Force CPU execution for NMS operation
-        results = model.predict(image, device='cpu')
+
+        results = model.predict(image)
         names = model.names
         predictions = []
         for result in results[0].boxes.xyxy:

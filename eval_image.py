@@ -1,8 +1,7 @@
 import argparse
 from depth_inference.depth_anything_v2 import DepthAnythingV2Inference
 from depth_inference.monodepth2 import MonoDepth2Inference
-from depth_inference.unidepth import UniDepthInference
-from depth_inference.zeodepth_inference import ZeoDepthInference
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Depth Estimation Script')
@@ -12,15 +11,20 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    # depth_anything = DepthAnythingV2Inference(input_path=args.input_path, depth_path=args.depth_path, eval=args.eval)
+    
     # monodepth = MonoDepth2Inference(input_path=args.input_path)
     # unidepth = UniDepthInference(input_path=args.input_path, depth_path=args.depth_path, eval=args.eval)
-    zeodepth = ZeoDepthInference(input_path=args.input_path, depth_path=args.depth_path, eval=args.eval)
+    # zeodepth = ZeoDepthInference(input_path=args.input_path, depth_path=args.depth_path, eval=args.eval)
 
-    # depth_anything.eval_stereo()
+  
     # monodepth.process_image()
     # unidepth.eval_stereo()
-    zeodepth.eval_stereo()
+    # zeodepth.eval_stereo()
+    depth_anything = DepthAnythingV2Inference(input_path=args.input_path, depth_path=args.depth_path, eval=args.eval)
+    # monodepth = MonoDepth2Inference(input_path=args.input_path)
+
+    depth_anything.eval_stereo()
+    # monodepth.process_image()
 
 
     

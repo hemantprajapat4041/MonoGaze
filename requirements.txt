@@ -24,3 +24,4 @@ diffusers
 accelerate
 huggingface_hub[hf-xet]
 torchdiffeq>=0.2.3
+scikit-image

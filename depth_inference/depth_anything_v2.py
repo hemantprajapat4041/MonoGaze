@@ -38,6 +38,7 @@ class DepthAnythingV2Inference:
 
         # self.model = Yolo2DObjectDetection('models/detection_models/bounding_box/test.pt')
         self.model = Yolo2DObjectDetection('models/detection_models/bounding_box/yolov8n.pt')
+
         self.depth_approximator = DepthApproximation(max_depth=self.max_depth)
 
         self.process_files()
