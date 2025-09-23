@@ -51,9 +51,16 @@ docs/_build/
 
 .DS_Store
 .vscode
-test.py
+test.*
 models/depth_models/Depth_Anything_V2/checkpoints
 *.pt 
 results
 out
-./video.mp4
+zed
+models/depth_models/HRDepth/weights
+models/depth_models/Marigold/checkpoints
+models/depth_models/MonoDepth2/models
+models/depth_models/MiDaS/weights
+models/depth_models/UniDepth/weights
+models/depth_models/ZoeDepth/checkpoints
+logs

@@ -10,3 +10,17 @@ imutils
 timm
 einops
 openvino
+hydra-core
+iopath
+tqdm
+numpy
+matplotlib
+eva-decord
+scikit-image
+scipy
+wandb
+transformers
+diffusers
+accelerate
+huggingface_hub[hf-xet]
+torchdiffeq>=0.2.3

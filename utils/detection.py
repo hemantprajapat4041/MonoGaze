@@ -7,15 +7,20 @@ class Yolo2DObjectDetection:
 
     def predict(self,image):
         model = self.model
-        results = model.predict(image)
+        # Force CPU execution for NMS operation
+        results = model.predict(image, device='cpu')
+        names = model.names
         predictions = []
         for result in results[0].boxes.xyxy:
             predictions.append({
                 'x1': int(result[0].item()),
                 'y1': int(result[1].item()),
                 'x2': int(result[2].item()),
-                'y2': int(result[3].item())
+                'y2': int(result[3].item()),
             })
+
+        for i in range(len(predictions)):
+            predictions[i]['class'] = names[int((results[0].boxes.cls[i]))]
         return predictions
     
     def lanczos_conversion(self, predictions, original_size, conversion_size):

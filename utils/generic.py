@@ -1,5 +1,6 @@
 import numpy as np
 import cv2,os
+import pandas as pd
 
 class DepthApproximation:
     def __init__(self, max_depth=80):
@@ -36,14 +37,16 @@ class DepthApproximation:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA, False)
         return img
 
-    def decode_depth(self, val):
-        NewValue = val*self.max_depth/255
+    def decode_depth(self, check, val):
+        NewValue = check*val/255
         return NewValue        
     
     def evaluate(self, input_path, img, filename, predictions):
-        file_path = os.path.join(input_path, os.path.splitext(os.path.basename(filename))[0] + '.npy')
+        name = os.path.splitext(os.path.basename(filename))[0]
+        file_path = os.path.join(input_path, name + '.npy')
         depth_frame = np.load(file_path)
         actual_pred = self.depth(predictions, depth_frame, eval=True)
         img = self.annotate_depth_on_img(img, actual_pred, eval=True)
-        return img
+        return img, actual_pred
+
         
